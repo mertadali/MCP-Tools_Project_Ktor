@@ -1,0 +1,180 @@
+<!-- resources/static/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .user-message {
+            background-color: #e5e7eb;
+            border-radius: 18px 18px 0 18px;
+        }
+        .bot-message {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 18px 18px 18px 0;
+        }
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes blink {
+            0% { opacity: 0.1; }
+            20% { opacity: 1; }
+            100% { opacity: 0.1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-center text-blue-600">MCP Chatbot</h1>
+        <p class="text-center text-gray-600">Powered by Model Context Protocol</p>
+    </header>
+
+    <div class="bg-white rounded-lg shadow-lg p-4 mb-4">
+        <div id="chat-container" class="chat-container space-y-4 mb-4 p-2">
+            <div class="bot-message p-3 max-w-md">
+                <p>Hello! I'm your AI assistant with MCP tools for GitHub, web browsing, and search. How can I help you today?</p>
+            </div>
+        </div>
+
+        <div id="typing-indicator" class="typing-indicator bot-message p-3 max-w-md hidden">
+            <p>Thinking<span>.</span><span>.</span><span>.</span></p>
+        </div>
+
+        <div class="flex space-x-2">
+            <input id="message-input" type="text" placeholder="Type your message..."
+                   class="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="send-button" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Send
+            </button>
+            <button id="clear-button" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                Clear
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-blue-50 rounded-lg p-4 text-sm">
+        <h3 class="font-bold mb-2">Example Commands:</h3>
+        <ul class="list-disc pl-5 space-y-1">
+            <li>Pull my latest GitHub repository</li>
+            <li>Search for the latest news about artificial intelligence</li>
+            <li>Visit the website openai.com and extract the text</li>
+            <li>Ask any general question for OpenAI to answer</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatContainer = document.getElementById('chat-container');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const clearButton = document.getElementById('clear-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        // Function to add a message to the chat
+        function addMessage(message, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isUser ? 'user-message p-3 ml-auto max-w-md' : 'bot-message p-3 max-w-md';
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Function to send a message to the server
+        async function sendMessage(message) {
+            // Show typing indicator
+            typingIndicator.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send message');
+                }
+
+                const data = await response.json();
+
+                // Hide typing indicator
+                typingIndicator.classList.add('hidden');
+
+                // Add bot response to chat
+                addMessage(data.response, false);
+            } catch (error) {
+                console.error('Error:', error);
+
+                // Hide typing indicator
+                typingIndicator.classList.add('hidden');
+
+                // Add error message to chat
+                addMessage('Sorry, there was an error processing your request.', false);
+            }
+        }
+
+        // Function to clear the conversation
+        async function clearConversation() {
+            try {
+                const response = await fetch('/api/clear', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to clear conversation');
+                }
+
+                // Clear chat container
+                chatContainer.innerHTML = '';
+
+                // Add welcome message
+                addMessage('Hello! I\'m your AI assistant with MCP tools for GitHub, web browsing, and search. How can I help you today?', false);
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Sorry, there was an error clearing the conversation.', false);
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                addMessage(message, true);
+                sendMessage(message);
+                messageInput.value = '';
+            }
+        });
+
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                const message = messageInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    sendMessage(message);
+                    messageInput.value = '';
+                }
+            }
+        });
+
+        clearButton.addEventListener('click', clearConversation);
+    });
+</script>
+</body>
+</html>

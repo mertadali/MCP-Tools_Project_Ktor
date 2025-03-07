@@ -1,0 +1,156 @@
+# MCP Chatbot
+
+An interactive chatbot application that uses the Model Context Protocol (MCP) to integrate OpenAI's assistant with various tools like GitHub, web browsing, and search capabilities.
+
+## Architecture
+
+The MCP Chatbot is built on a modular architecture:
+
+1. **Core Components**:
+   - **Chatbot Controller**: Coordinates between users, OpenAI assistant, and MCP tools
+   - **MCP Tool Router**: Routes user queries to appropriate MCP tools
+   - **OpenAI Assistant**: Handles general conversation and interprets tool responses
+
+2. **MCP Tools**:
+   - **GitHub Tool**: Fetches repository data, commits, branches, etc.
+   - **Brave Search Tool**: Performs web searches, image searches, and news searches
+   - **Puppeteer Tool**: Browses websites, takes screenshots, extracts text
+
+3. **User Interface**:
+   - Simple web-based chat interface
+
+## Requirements
+
+- JDK 17 or higher
+- Gradle 7.4 or higher
+- Docker and Docker Compose (for running MCP servers)
+- API keys for:
+  - OpenAI API
+  - GitHub API
+  - Brave Search API
+
+## Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/mcp-chatbot.git
+cd mcp-chatbot
+```
+
+### 2. Configure API keys
+
+Create a `.env` file in the `config` directory:
+
+```bash
+mkdir -p config
+touch config/.env
+```
+
+Add your API keys to the `.env` file:
+
+```
+OPENAI_API_KEY=your_openai_api_key
+GITHUB_API_KEY=your_github_api_key
+BRAVE_SEARCH_API_KEY=your_brave_search_api_key
+```
+
+### 3. Build the application
+
+```bash
+./gradlew build
+```
+
+## Running the Application
+
+### Option 1: Running locally
+
+```bash
+./gradlew run
+```
+
+This will start the application on port 8080. You can access the chat interface at http://localhost:8080.
+
+### Option 2: Running with Docker Compose
+
+```bash
+docker-compose up -d
+```
+
+This will start all required services:
+- MCP Chatbot on port 8080
+- GitHub MCP Server on port 3000
+- Brave Search MCP Server on port 3001
+- Puppeteer MCP Server on port 3002
+
+You can access the chat interface at http://localhost:8080.
+
+## Usage Examples
+
+Here are some example queries to try:
+
+### GitHub Tool
+- "Pull my latest GitHub repository"
+- "Show my GitHub repositories"
+- "Get the latest commits for my repo named 'project-name'"
+- "List branches for the repository 'project-name'"
+
+### Brave Search Tool
+- "Search for artificial intelligence news"
+- "Find images of mountain landscapes"
+- "Search for the latest developments in quantum computing"
+- "Look up recipes for chocolate cake"
+
+### Puppeteer Tool
+- "Visit wikipedia.org and extract text from the main page"
+- "Take a screenshot of openai.com"
+- "Go to github.com and tell me what's on the homepage"
+- "Browse reddit.com/r/programming and summarize the top posts"
+
+### General Queries
+- Any general questions will be handled by the OpenAI assistant
+
+## Development
+
+### Project Structure
+
+```
+mcp-chatbot/
+├── src/
+│   └── main/
+│       ├── kotlin/
+│       │   └── com/
+│       │       └── mcp/
+│       │           └── chatbot/
+│       │               ├── ai/                  # OpenAI integration
+│       │               ├── controller/          # Main controllers
+│       │               ├── protocol/            # MCP protocol definitions
+│       │               ├── tools/               # Tool implementations
+│       │               └── Main.kt              # Application entry point
+│       └── resources/
+│           └── static/                          # Web UI resources
+├── config/                                       # Configuration directory
+├── Dockerfile                                    # Dockerfile for building app
+├── docker-compose.yml                            # Docker Compose configuration
+└── build.gradle.kts                              # Gradle build configuration
+```
+
+### Adding New MCP Tools
+
+To add a new MCP tool:
+
+1. Create a new tool class that implements the `MCPTool` interface
+2. Add trigger patterns to recognize relevant user queries
+3. Implement the `execute` method to handle the tool's functionality
+4. Update the `MCPToolManager` to include your new tool
+
+## Resources
+
+- [Model Context Protocol GitHub](https://github.com/modelcontextprotocol/servers)
+- [MCP GitHub Server](https://github.com/modelcontextprotocol/servers/tree/main/src/github)
+- [MCP Brave Search Server](https://github.com/modelcontextprotocol/servers/tree/main/src/brave-search)
+- [MCP Puppeteer Server](https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer)
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # MCP Chatbot application
+  mcp-chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-chatbot
+    ports:
+      - "8080:8080"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GITHUB_API_KEY=${GITHUB_API_KEY}
+      - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY}
+    depends_on:
+      - github-mcp-server
+      - brave-search-mcp-server
+      - puppeteer-mcp-server
+    networks:
+      - mcp-network
+    volumes:
+      - ./config:/app/config
+
+  # GitHub MCP Server
+  github-mcp-server:
+    image: ghcr.io/modelcontextprotocol/github-server:latest
+    container_name: github-mcp-server
+    ports:
+      - "3000:3000"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_API_KEY}
+    networks:
+      - mcp-network
+
+  # Brave Search MCP Server
+  brave-search-mcp-server:
+    image: ghcr.io/modelcontextprotocol/brave-search-server:latest
+    container_name: brave-search-mcp-server
+    ports:
+      - "3001:3000"
+    environment:
+      - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY}
+    networks:
+      - mcp-network
+
+  # Puppeteer MCP Server
+  puppeteer-mcp-server:
+    image: ghcr.io/modelcontextprotocol/puppeteer-server:latest
+    container_name: puppeteer-mcp-server
+    ports:
+      - "3002:3000"
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
