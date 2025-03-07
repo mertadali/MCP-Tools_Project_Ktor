@@ -47,7 +47,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
 
-    // Temel kütüphaneler
     implementation("io.ktor:ktor-server-core:2.2.4")
     implementation("io.ktor:ktor-server-netty:2.2.4")
     implementation("io.ktor:ktor-client-core:3.1.0")
@@ -57,12 +56,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
     implementation("com.aallam.openai:openai-client:3.0.0")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    implementation("org.slf4j:slf4j-simple:2.0.5")
 
-    // MCP için gerekli HTTP kütüphaneleri
+    // MCP Protocol libraries
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
-
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
 
 }
