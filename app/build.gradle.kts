@@ -54,8 +54,8 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:3.1.0")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
-    implementation("com.aallam.openai:openai-client:3.0.0")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+// build.gradle.kts
+    implementation("com.aallam.openai:openai-client:3.0.0") // Belirli bir sürümü kullan    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("org.slf4j:slf4j-simple:2.0.5")
 
     // MCP Protocol libraries
